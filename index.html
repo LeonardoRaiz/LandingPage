@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Disponibilidade do Professor</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <div class="container">
+        <h1>Disponibilidade do Professor</h1>
+
+        <label>Nome do Professor:</label><br>
+        <input v-model="professor" type="text" /><br><br>
+
+        <label>Carga Horária Semanal (aulas):</label><br>
+        <input v-model.number="cargaHoraria" type="number" min="1" /><br><br>
+
+        <div v-if="professor && cargaHoraria">
+            <h3>Selecione {{disponibilidadeNecessaria}} períodos ({{cargaHoraria}} aulas + 50%):</h3>
+            <p class="explicacao">
+                <strong>Atenção:</strong> Cada período marcado equivale a 2 aulas.
+                Portanto, se você possui {{ cargaHoraria }} aulas, deve selecionar pelo menos {{ disponibilidadeNecessaria }} períodos.
+            </p>
+            <transition name="fade">
+                <div v-if="valido" class="meta-sucesso">
+                    ✅ Disponibilidade mínima atingida! Obrigado! 🎉
+                </div>
+            </transition>
+            <div id="pdf-content">
+                <p><strong>Professor:</strong> {{ professor }}</p>
+                <p><strong>Carga Horária:</strong> {{ cargaHoraria }} aulas (mínimo de {{ disponibilidadeNecessaria }} períodos de disponibilidade)</p>
+
+                <!-- Matutino -->
+                <div class="section-title">Matutino</div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Horário</th>
+                            <th v-for="dia in dias">{{ dia }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="slot in periodosMatutino">
+                            <td>{{ slot.hora }}</td>
+                            <td v-for="dia in dias">
+                                <input
+                                        type="checkbox"
+                                        :id="dia + '-' + slot.label"
+                                        v-model="selecionados[dia][slot.label]"
+                                        :style="{ accentColor: checkboxCores[dia + '-' + slot.label] || 'var(--primary)' }"
+                                />
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Noturno -->
+                <div class="section-title">Noturno</div>
+                <div class="table-wrapper">
+                    <table>
+                    <thead>
+                    <tr>
+                        <th>Horário</th>
+                        <th v-for="dia in dias">{{ dia }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="slot in periodosNoturno">
+                        <td>{{ slot.hora }}</td>
+                        <td v-for="dia in dias">
+                            <input
+                                    type="checkbox"
+                                    :id="dia + '-' + slot.label"
+                                    v-model="selecionados[dia][slot.label]"
+                                    :style="{ accentColor: checkboxCores[dia + '-' + slot.label] || 'var(--primary)' }"
+                            />
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+
+            <div class="error" v-if="!valido && tentadoGerar">
+                Você selecionou apenas {{ totalSelecionados }} períodos. Selecione no mínimo {{ disponibilidadeNecessaria }}.
+            </div>
+
+            <div class="success" v-if="valido && tentadoGerar">
+                Pronto para gerar PDF!
+            </div>
+
+            <button class="btn" @click="gerarPDF">Gerar PDF</button>
+        </div>
+    </div>
+</div>
+
+<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</body>
+</html>
