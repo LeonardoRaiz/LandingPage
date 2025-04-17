@@ -21,16 +21,23 @@
         <input v-model.number="cargaHoraria" type="number" min="1" /><br><br>
 
         <div v-if="professor && cargaHoraria">
-            <h3>Selecione {{disponibilidadeNecessaria}} períodos ({{cargaHoraria}} aulas + 50%):</h3>
+            <h3>Você deve selecionar no mínimo {{ minimosObrigatorios }} períodos (equivalente a {{ cargaHoraria }} aulas), e recomendamos {{ disponibilidadeNecessaria }} períodos (50% a mais).</h3>
             <p class="explicacao">
                 <strong>Atenção:</strong> Cada período marcado equivale a 2 aulas.
                 Portanto, se você possui {{ cargaHoraria }} aulas, deve selecionar pelo menos {{ disponibilidadeNecessaria }} períodos.
             </p>
-            <transition name="fade">
-                <div v-if="valido" class="meta-sucesso">
-                    ✅ Disponibilidade mínima atingida! Obrigado! 🎉
+            <div class="progresso-wrapper">
+                <div class="progresso-info">
+                    {{ totalSelecionados }} períodos selecionados de {{ disponibilidadeNecessaria }} recomendados
                 </div>
-            </transition>
+                <div class="progresso-barra">
+                    <div
+                            class="progresso-preenchido"
+                            :class="{ atingiuMinimo: totalSelecionados >= minimosObrigatorios }"
+                            :style="{ width: (barraProgresso * 100) + '%' }"
+                    ></div>
+                </div>
+            </div>
             <div id="pdf-content">
                 <p><strong>Professor:</strong> {{ professor }}</p>
                 <p><strong>Carga Horária:</strong> {{ cargaHoraria }} aulas (mínimo de {{ disponibilidadeNecessaria }} períodos de disponibilidade)</p>
@@ -68,13 +75,13 @@
                     <thead>
                     <tr>
                         <th>Horário</th>
-                        <th v-for="dia in dias">{{ dia }}</th>
+                        <th v-for="dia in diasNoturno">{{ dia }}</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr v-for="slot in periodosNoturno">
                         <td>{{ slot.hora }}</td>
-                        <td v-for="dia in dias">
+                        <td v-for="dia in diasNoturno">
                             <input
                                     type="checkbox"
                                     :id="dia + '-' + slot.label"
@@ -86,10 +93,13 @@
                     </tbody>
                 </table>
                 </div>
+                <div class="alerta-pdf" v-if="!atingiuRecomendado" >
+                    ⚠️ O professor não indicou 50% de disponibilidade extra, conforme recomendado para alocação eficiente.
+                </div>
             </div>
 
             <div class="error" v-if="!valido && tentadoGerar">
-                Você selecionou apenas {{ totalSelecionados }} períodos. Selecione no mínimo {{ disponibilidadeNecessaria }}.
+                Você selecionou apenas {{ totalSelecionados }} períodos. Selecione no mínimo {{ minimosObrigatorios }}.
             </div>
 
             <div class="success" v-if="valido && tentadoGerar">

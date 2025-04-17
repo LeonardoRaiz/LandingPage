@@ -3,6 +3,7 @@ const { createApp } = Vue;
 createApp({
     data() {
         const dias = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        const diasNoturno = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 
         const periodosMatutino = [
             { label: '07:40-09:20', hora: '07:40 – 09:20' },
@@ -29,6 +30,7 @@ createApp({
             professor: '',
             cargaHoraria: 0,
             dias,
+            diasNoturno,
             periodosMatutino,
             periodosNoturno,
             selecionados,
@@ -41,10 +43,20 @@ createApp({
                 return acc + Object.values(dia).filter(v => v).length;
             }, 0);
         },
+        // Mínimo obrigatório: quantidade de períodos para cobrir a carga horária
+        minimosObrigatorios() {
+            return Math.ceil(this.cargaHoraria / 2);
+        },
+        // Recomendado com 50% extra
         disponibilidadeNecessaria() {
             return Math.ceil((this.cargaHoraria * 1.5) / 2);
         },
+        // Só pode gerar PDF se atingir o mínimo obrigatório
         valido() {
+            return this.totalSelecionados >= this.minimosObrigatorios;
+        },
+        // Para exibir mensagem de recomendação no PDF
+        atingiuRecomendado() {
             return this.totalSelecionados >= this.disponibilidadeNecessaria;
         },
         checkboxCores() {
@@ -66,6 +78,10 @@ createApp({
             });
 
             return cores;
+        },
+        barraProgresso() {
+            const progresso = this.totalSelecionados / this.disponibilidadeNecessaria;
+            return Math.min(1, progresso); // máximo 100%
         }
     },
     methods: {
@@ -74,7 +90,7 @@ createApp({
 
             if (!this.valido) {
                 Toastify({
-                    text: "Você precisa selecionar pelo menos " + this.disponibilidadeNecessaria + " períodos!",
+                    text: "Você precisa selecionar pelo menos " + this.minimosObrigatorios + " períodos!",
                     duration: 4000,
                     gravity: "top",
                     position: "right",
