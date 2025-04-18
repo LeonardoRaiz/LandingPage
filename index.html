@@ -96,6 +96,13 @@
                 <div class="alerta-pdf" v-if="!atingiuRecomendado" >
                     ⚠️ O professor não indicou 50% de disponibilidade extra, conforme recomendado para alocação eficiente.
                 </div>
+                <div class="assinatura-digital">
+                    <p><strong>Assinatura Digital:</strong></p>
+                    <canvas id="assinatura-canvas" style="width: 100%; height: 120px;"></canvas>
+                    <div class="assinatura-botoes">
+                        <button type="button" class="btn limpar" @click="limparAssinatura">Limpar</button>
+                    </div>
+                </div>
             </div>
 
             <div class="error" v-if="!valido && tentadoGerar">
@@ -113,5 +120,6 @@
 
 <script src="app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
 </body>
 </html>

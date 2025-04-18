@@ -52,12 +52,36 @@ body {
 
 .progresso-preenchido {
     height: 100%;
-    background-color: var(--error); /* padrão: vermelho */
+    background-color: var(--error);
     transition: width 0.4s ease;
 }
 
 .progresso-preenchido.atingiuMinimo {
-    background-color: var(--success); /* verde se atingiu o mínimo */
+    background-color: var(--success);
+}
+
+.assinatura-digital {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.assinatura-digital canvas {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background-color: white;
+    display: block;
+    margin: 0 auto;
+    touch-action: none;
+}
+
+.assinatura-botoes {
+    margin-top: 0.5rem;
+}
+
+.assinatura-botoes .limpar {
+    background-color: #f87171;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
 }
 
 .container {
@@ -159,7 +183,7 @@ th {
 }
 
 .table-wrapper table {
-    min-width: 600px; /* ou mais, se necessário */
+    min-width: 600px;
 }
 
 input[type="checkbox"] {
@@ -169,8 +193,6 @@ input[type="checkbox"] {
     cursor: pointer;
 }
 
-
-/* Responsividade para telas menores */
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
